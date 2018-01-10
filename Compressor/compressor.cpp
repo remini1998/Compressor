@@ -26,33 +26,39 @@ treeNode<record>* compressor::genHuffmanTree(treeNode<record>** src) {
 		list.push_back(src[a]);
 	}
 	treeNode<record> *father;
-	std::vector<treeNode<record>*>::iterator min1 = list.begin();
-	std::vector<treeNode<record>*>::iterator min2 = list.begin();
+	treeNode<record>* min1 = list[0];
+	treeNode<record>* min2;
 	while (list.size() > 1) { // 这个可能是空间大小 小心
 		// 找到最小的两个
-		min1 = list.begin();
-		min2 = list.begin();
-		min2++;
-		for (std::vector<treeNode<record>*>::iterator now = list.begin()+1; now != list.end(); now++) {
-			if ((*min1)->data.count > (*now)->data.count) {
+		min1 = list[0];
+		min2 = list[1];
+		list.erase(list.begin());
+		list.erase(list.begin());
+		for (int a = 0; a < (list.size());) {
+			if (min1->data.count > list[a]->data.count) {
+				list.push_back(min2);
 				min2 = min1;
-				min1 = now;
+				min1 = list[a];
+				list.erase(list.begin() + a);
 			}
-			else if ((*min2)->data.count > (*now)->data.count) {
-				
-				min2 = now;
+			else if (min2->data.count > list[a]->data.count) {
+				list.push_back(min2);
+				min2 = list[a];
+				list.erase(list.begin() + a);
+			}
+			else
+			{
+				a++;
 			}
 		}
 
 		// 拼接两个结点
 		father = new treeNode<record>();
 		father->data.value = -1;
-		father->data.count = (*min1)->data.count + (*min2)->data.count;
-		father->lChild = *min1;
-		father->rChild = *min2;
-
-		list.erase(min2);
-		list.erase(min1);
+		father->data.count = min1->data.count + min2->data.count;
+		father->lChild = min1;
+		father->rChild = min2;
+		
 		list.push_back(father);
 
 	}
