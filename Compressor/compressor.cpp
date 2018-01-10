@@ -38,8 +38,10 @@ treeNode<record>* compressor::genHuffmanTree(treeNode<record>** src) {
 				min2 = min1;
 				min1 = now;
 			}
-			else if ((*min2)->data.count > (*now)->data.count)
+			else if ((*min2)->data.count > (*now)->data.count) {
+				
 				min2 = now;
+			}
 		}
 
 		// 拼接两个结点
