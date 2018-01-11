@@ -55,13 +55,16 @@ public:
 	byte* encodeByHuffmanTree(byte* input, int inLens, int* outLens, treeNode<record>* hTree);
 
 	// 按Huffman树将编码转换为文件
-	byte* decodeByHuffmanTree(byte* input, int inLens, int* outLens, treeNode<record>* hTree);
+	byte* decodeByHuffmanTree(byte* input, int* outLens, treeNode<record>* hTree);
 
 	// 将bytes写入文件
-	void write2File(char* filename, byte* input, int lens);
+	void write2File(std::string filename, byte* input, int lens);
 
 	// 从文件读入bytes
-	byte* readFromFile(char* filename, int* lens);
+	byte* readFromFile(std::string filename, unsigned int* lens);
+
+	// 拼接两个byte留
+	byte* bytecat(byte* byte1, int lens1, byte* byte2, int lens2);
 
 	compressor();
 	~compressor();

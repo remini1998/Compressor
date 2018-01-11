@@ -1,10 +1,16 @@
 #include <vector>
 #include <algorithm>  
+#include <fstream>
+#include <iostream>
 #include <string>
 #include <math.h>
 #include <string.h>
 #include "compressor.h"
 #include "treeNode.h"
+
+#define MAX_BUFFER 102400
+
+using namespace std;
 
 void compressor::recordEncode(treeNode<record>* r, char* beforeVal)
 {
@@ -180,13 +186,13 @@ byte * compressor::encodeByHuffmanTree(byte * input, int inLens, int* outLens, t
 	return resultb;
 }
 
-byte * compressor::decodeByHuffmanTree(byte * input, int inLens, int* outLens, treeNode<record>* hTree)
+byte * compressor::decodeByHuffmanTree(byte * input,  int* outLens, treeNode<record>* hTree)
 {
 	std::vector<byte> resultv;
 	bool data[8];
 	int boolIndex = 0;
 	treeNode<record>* nowNode = hTree;
-	for (int nowInput = 0; nowInput < inLens; nowInput++) {
+	for (int nowInput = 0; true; nowInput++) {
 		byte tb = input[nowInput];
 		//data[0]为开头位
 		for (int a = 0; a < 8; a++) {
@@ -220,9 +226,53 @@ FOR_END:
 	return resultb;
 }
 
-void compressor::write2File(char * filename, byte * input, int lens)
+void compressor::write2File(string filename, byte * input, int lens)
 {
+	ofstream wfile(filename, ios::out | ios::binary);
+	if (wfile.bad()) {
+		cout << "写入失败！" << endl;
+		return;
+	}
+	wfile.write((char *)input, sizeof(char)*lens);
+	wfile.close();
+}
 
+byte * compressor::readFromFile(string filename, unsigned int * lens)
+{
+	ifstream rfile(filename, ios::in | ios::binary);
+	if (rfile.bad()) {
+		cout << "读入失败！" << endl;
+		return 0;
+	}
+	vector<byte> v;
+	while (!rfile.eof()) {
+		byte buffer[MAX_BUFFER] = { 0 };
+		//rfile.read((char*)buffer, MAX_BUFFER * sizeof(char));
+		rfile.read((char*)buffer, MAX_BUFFER);
+		int l = rfile.gcount();//获取当前读取长度
+		for (int a = 0; a < l; a++) {
+			v.push_back(buffer[a]);
+		}
+	}
+	rfile.close();
+	*lens = v.size();
+	byte* b = new byte[*lens];
+	for (unsigned int a = 0; a < *lens; a++) {
+		b[a] = v[a];
+	}
+	return b;
+}
+
+byte * compressor::bytecat(byte * byte1, int lens1, byte * byte2, int lens2)
+{
+	byte* result = new byte[lens1 + lens2];
+	for (int a = 0; a < lens1; a++) {
+		result[a] = byte1[a];
+	}
+	for (int a = 0; a < lens2; a++) {
+		result[a + lens1] = byte2[a];
+	}
+	return result;
 }
 
 compressor::compressor()
