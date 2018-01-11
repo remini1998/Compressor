@@ -12,6 +12,10 @@ void test() {
 	byte* countb = c.transCountResult2Bytes(count);
 	treeNode<record>** countNew = c.transBytes2CountResult(countb);
 	treeNode<record>* hTreeNew = c.genHuffmanTree(countNew);
+
+	int encodeLens, decodeLens;
+	byte* encode = c.encodeByHuffmanTree(test, 10, &encodeLens, hTree);
+	byte* decode = c.decodeByHuffmanTree(encode, encodeLens, &decodeLens, hTree);
 }
 
 int main() {

@@ -26,7 +26,7 @@ class compressor
 private:
 
 	// 编码集，第256位是截止编码位
-	char* encode[257];
+	std::string encode[257];
 
 	// 用于遍历的方法。用到递归，后变量为递归使用
 	void recordEncode(treeNode<record>* r, char* beforeVal = "");

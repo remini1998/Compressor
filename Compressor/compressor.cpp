@@ -1,5 +1,6 @@
 #include <vector>
 #include <algorithm>  
+#include <string>
 #include <math.h>
 #include <string.h>
 #include "compressor.h"
@@ -8,14 +9,10 @@
 void compressor::recordEncode(treeNode<record>* r, char* beforeVal)
 {
 	if (r->data.value >= 0) {
-		this->encode[r->data.value] = new char[256];
-		strcpy(this->encode[r->data.value], beforeVal);
+		this->encode[r->data.value] = beforeVal;
 	}
 	else if (r->data.value == END_NODE) {
-		this->encode[256] = new char[256];
-
-		int lens = strlen(beforeVal) + 1;
-		strcpy(this->encode[256], beforeVal);
+		this->encode[256] = beforeVal;
 	}
 	else {
 		char bsl[256];
@@ -63,7 +60,7 @@ treeNode<record>* compressor::genHuffmanTree(treeNode<record>** count) {
 	treeNode<record>* end = new treeNode<record>();
 	end->data.count = 1;
 	end->data.value = END_NODE;
-
+	list.push_back(end);
 
 
 	treeNode<record> *father;
@@ -127,10 +124,11 @@ treeNode<record>** compressor::transBytes2CountResult(byte * bytes)
 	for (int a = 0; a < 256; a++) {
 		r[a] = new treeNode<record>();
 		r[a]->data.count =
-			(bytes[a] << (8 * 3))
-			+ (bytes[a + 1] << (8 * 2))
-			+ (bytes[a + 2] << (8 * 1))
-			+ (bytes[a + 3]);
+			(bytes[4 * a] << (8 * 3))
+			+ (bytes[4 * a + 1] << (8 * 2))
+			+ (bytes[4 * a + 2] << (8 * 1))
+			+ (bytes[4 * a + 3]);
+		r[a]->data.value = a;
 	}
 	return r;
 }
@@ -142,12 +140,12 @@ byte * compressor::encodeByHuffmanTree(byte * input, int inLens, int* outLens, t
 	bool data[8];
 	int boolIndex = 0;
 	for (int a = 0; a <= inLens; a++) {
-		char* encodeNow;
+		std::string encodeNow;
 		if (a == inLens)
 			encodeNow = encode[256];
 		else
 			encodeNow = encode[input[a]];
-		int lens = strlen(encodeNow);
+		int lens = encodeNow.size();
 		// 将记录值一一打入
 		for (int b = 0; b < lens; b++) {
 			char t = encodeNow[b];
